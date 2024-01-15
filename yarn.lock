@@ -11,6 +11,8 @@ __metadata:
   dependencies:
     "@layerzerolabs/lz-evm-oapp-v2": ^2.0.11
     "@layerzerolabs/lz-evm-protocol-v2": ^2.0.11
+    "@openzeppelin/contracts": ^5.0.1
+    "@openzeppelin/contracts-upgradeable": ^5.0.1
   languageName: unknown
   linkType: soft
 
@@ -37,5 +39,21 @@ __metadata:
     hardhat-deploy: ^0.11.44
     solidity-bytes-utils: ^0.8.0
   checksum: be45219acd408b7d274ac1e6c2ba7ef309791126d313e2f4c98cdafc8684ff69354b1c7c36085fb79313d43a1f1307f3c96a940fcdd3d9c6ecbf7eaeaac6825d
+  languageName: node
+  linkType: hard
+
+"@openzeppelin/contracts-upgradeable@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "@openzeppelin/contracts-upgradeable@npm:5.0.1"
+  peerDependencies:
+    "@openzeppelin/contracts": 5.0.1
+  checksum: a3a09ce10bc4647ab440aa56098b94e8a8bb763a9a399b834a4b7804be03d36331097b8e8f323791c0a0802a84d900597af1e23ac25aaeebeab0a2ae32763fc8
+  languageName: node
+  linkType: hard
+
+"@openzeppelin/contracts@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "@openzeppelin/contracts@npm:5.0.1"
+  checksum: bc056d358a672f0d43ff5a372b5b65c6d3e9e49478f70bc00a5ad06ce9107400e8e8b8d94cf85dffca00b303ee8d15ac8def55d320ea54386dc81d6b98ddfabc
   languageName: node
   linkType: hard
