@@ -3,14 +3,14 @@
 pragma solidity ^0.8.22;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { IPreCrime } from "./interfaces/IPreCrime.sol";
-import { IOAppPreCrimeSimulator, InboundPacket, Origin } from "./interfaces/IOAppPreCrimeSimulator.sol";
+import { IPreCrime } from "LayerZero-v2/oapp/contracts/precrime/interfaces/IPreCrime.sol";
+import { IOAppPreCrimeSimulator, InboundPacket, Origin } from "LayerZero-v2/oapp/contracts/precrime/interfaces/IOAppPreCrimeSimulator.sol";
 
 /**
  * @title OAppPreCrimeSimulator
  * @dev Abstract contract serving as the base for preCrime simulation functionality in an OApp.
  */
-abstract contract OAppPreCrimeSimulator is IOAppPreCrimeSimulator, Ownable {
+abstract contract OAppPreCrimeSimulatorUpgradeable is IOAppPreCrimeSimulator, Ownable {
     // The address of the preCrime implementation.
     address public preCrime;
 

@@ -3,13 +3,13 @@
 pragma solidity ^0.8.22;
 
 import { ILayerZeroReceiver, Origin } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroReceiver.sol";
-import { OAppCore } from "./OAppCore.sol";
+import { OAppCoreUpgradeable } from "./OAppCoreUpgradeable.sol";
 
 /**
  * @title OAppReceiver
  * @dev Abstract contract implementing the ILayerZeroReceiver interface and extending OAppCore for OApp receivers.
  */
-abstract contract OAppReceiver is ILayerZeroReceiver, OAppCore {
+abstract contract OAppReceiverUpgradeable is ILayerZeroReceiver, OAppCoreUpgradeable {
     // Custom error message for when the caller is not the registered endpoint/
     error OnlyEndpoint(address addr);
 

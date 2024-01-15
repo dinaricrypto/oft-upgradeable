@@ -2,21 +2,21 @@
 
 pragma solidity ^0.8.22;
 
-import { OApp, Origin } from "../oapp/OApp.sol";
-import { OAppOptionsType3 } from "../oapp/libs/OAppOptionsType3.sol";
-import { IOAppMsgInspector } from "../oapp/interfaces/IOAppMsgInspector.sol";
+import { OAppUpgradeable, Origin } from "../oapp/OAppUpgradeable.sol";
+import { OAppOptionsType3Upgradeable } from "../oapp/libs/OAppOptionsType3Upgradeable.sol";
+import { IOAppMsgInspector } from "LayerZero-v2/oapp/contracts/oapp/interfaces/IOAppMsgInspector.sol";
 
-import { OAppPreCrimeSimulator } from "../precrime/OAppPreCrimeSimulator.sol";
+import { OAppPreCrimeSimulatorUpgradeable } from "../precrime/OAppPreCrimeSimulatorUpgradeable.sol";
 
-import { IOFT, SendParam, OFTLimit, OFTReceipt, OFTFeeDetail, MessagingReceipt, MessagingFee } from "./interfaces/IOFT.sol";
-import { OFTMsgCodec } from "./libs/OFTMsgCodec.sol";
-import { OFTComposeMsgCodec } from "./libs/OFTComposeMsgCodec.sol";
+import { IOFT, SendParam, OFTLimit, OFTReceipt, OFTFeeDetail, MessagingReceipt, MessagingFee } from "LayerZero-v2/oapp/contracts/oft/interfaces/IOFT.sol";
+import { OFTMsgCodec } from "LayerZero-v2/oapp/contracts/oft/libs/OFTMsgCodec.sol";
+import { OFTComposeMsgCodec } from "LayerZero-v2/oapp/contracts/oft/libs/OFTComposeMsgCodec.sol";
 
 /**
  * @title OFTCore
  * @dev Abstract contract for the OftChain (OFT) token.
  */
-abstract contract OFTCore is IOFT, OApp, OAppPreCrimeSimulator, OAppOptionsType3 {
+abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimulatorUpgradeable, OAppOptionsType3Upgradeable {
     using OFTMsgCodec for bytes;
     using OFTMsgCodec for bytes32;
 
@@ -50,7 +50,7 @@ abstract contract OFTCore is IOFT, OApp, OAppPreCrimeSimulator, OAppOptionsType3
      * @param _endpoint The address of the LayerZero endpoint.
      * @param _owner The address of the OFT owner.
      */
-    constructor(uint8 _localDecimals, address _endpoint, address _owner) OApp(_endpoint, _owner) {
+    constructor(uint8 _localDecimals, address _endpoint, address _owner) OAppUpgradeable(_endpoint, _owner) {
         if (_localDecimals < sharedDecimals()) revert InvalidLocalDecimals();
         decimalConversionRate = 10 ** (_localDecimals - sharedDecimals());
     }

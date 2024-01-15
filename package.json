@@ -1,0 +1,11 @@
+{
+  "name": "@dinari/oft-upgradeable",
+  "version": "0.1.0",
+  "packageManager": "yarn@3.6.4",
+  "scripts": {
+    "test": "forge test -vvv"
+  },
+  "devDependencies": {
+    "@layerzerolabs/lz-evm-protocol-v2": "^2.0.11"
+  }
+}
