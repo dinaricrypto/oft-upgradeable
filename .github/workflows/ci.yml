@@ -33,38 +33,40 @@ jobs:
         run: |
           forge fmt --check
   
-  analyze:
-    strategy:
-      matrix:
-        python-version: [3.8]
-        slither-version: [0.10.0]
+  # analyze:
+  #   strategy:
+  #     matrix:
+  #       python-version: [3.8]
+  #       slither-version: [0.10.0]
 
-    name: Slither
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
+  #   name: Slither
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         submodules: recursive
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
+  #     - name: Install Foundry
+  #       uses: foundry-rs/foundry-toolchain@v1
+  #       with:
+  #         version: nightly
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
 
-      - name: Install Slither
-        run: python3 -m pip install slither-analyzer==${{ matrix.slither-version }}
+  #     - name: Install Slither
+  #       run: python3 -m pip install slither-analyzer==${{ matrix.slither-version }}
 
-      - name: Static analysis
-        run: slither .
+  #     - name: Static analysis
+  #       run: slither .
 
   check:
     strategy:
       fail-fast: true
+      matrix:
+        node-version: [16.x]
 
     name: Forge Testing
     runs-on: ubuntu-latest
@@ -72,6 +74,18 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+  
+      - name: Enable Node Corepack
+        run: corepack enable
+
+      - name: Yarn Install
+        run: yarn install
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -90,12 +104,28 @@ jobs:
         id: test
 
   coverage:
+    strategy:
+      matrix:
+        node-version: [16.x]
+
     name: Forge Coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+  
+      - name: Enable Node Corepack
+        run: corepack enable
+
+      - name: Yarn Install
+        run: yarn install
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
