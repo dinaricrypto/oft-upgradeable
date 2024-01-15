@@ -2,23 +2,91 @@
 
 pragma solidity ^0.8.22;
 
-import { OAppUpgradeable, Origin } from "../oapp/OAppUpgradeable.sol";
-import { OAppOptionsType3Upgradeable } from "../oapp/libs/OAppOptionsType3Upgradeable.sol";
-import { IOAppMsgInspector } from "LayerZero-v2/oapp/contracts/oapp/interfaces/IOAppMsgInspector.sol";
+import {OAppUpgradeable, Origin} from "../oapp/OAppUpgradeable.sol";
+import {OAppOptionsType3Upgradeable} from "../oapp/libs/OAppOptionsType3Upgradeable.sol";
+import {IOAppMsgInspector} from "LayerZero-v2/oapp/contracts/oapp/interfaces/IOAppMsgInspector.sol";
 
-import { OAppPreCrimeSimulatorUpgradeable } from "../precrime/OAppPreCrimeSimulatorUpgradeable.sol";
+import {OAppPreCrimeSimulatorUpgradeable} from "../precrime/OAppPreCrimeSimulatorUpgradeable.sol";
 
-import { IOFT, SendParam, OFTLimit, OFTReceipt, OFTFeeDetail, MessagingReceipt, MessagingFee } from "LayerZero-v2/oapp/contracts/oft/interfaces/IOFT.sol";
-import { OFTMsgCodec } from "LayerZero-v2/oapp/contracts/oft/libs/OFTMsgCodec.sol";
-import { OFTComposeMsgCodec } from "LayerZero-v2/oapp/contracts/oft/libs/OFTComposeMsgCodec.sol";
+import {
+    IOFT,
+    SendParam,
+    OFTLimit,
+    OFTReceipt,
+    OFTFeeDetail,
+    MessagingReceipt,
+    MessagingFee
+} from "LayerZero-v2/oapp/contracts/oft/interfaces/IOFT.sol";
+import {OFTMsgCodec} from "LayerZero-v2/oapp/contracts/oft/libs/OFTMsgCodec.sol";
+import {OFTComposeMsgCodec} from "LayerZero-v2/oapp/contracts/oft/libs/OFTComposeMsgCodec.sol";
 
 /**
  * @title OFTCore
  * @dev Abstract contract for the OftChain (OFT) token.
  */
-abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimulatorUpgradeable, OAppOptionsType3Upgradeable {
+abstract contract OFTCoreUpgradeable is
+    IOFT,
+    OAppUpgradeable,
+    OAppPreCrimeSimulatorUpgradeable,
+    OAppOptionsType3Upgradeable
+{
     using OFTMsgCodec for bytes;
     using OFTMsgCodec for bytes32;
+
+    // @notice Msg types that are used to identify the various OFT operations.
+    // @dev This can be extended in child contracts for non-default oft operations
+    // @dev These values are used in things like combineOptions() in OAppOptionsType3.sol.
+    uint16 public constant SEND = 1;
+    uint16 public constant SEND_AND_CALL = 2;
+
+    struct OFTCoreStorage {
+        // @notice Provides a conversion rate when swapping between denominations of SD and LD
+        //      - shareDecimals == SD == shared Decimals
+        //      - localDecimals == LD == local decimals
+        // @dev Considers that tokens have different decimal amounts on various chains.
+        // @dev eg.
+        //  For a token
+        //      - locally with 4 decimals --> 1.2345 => uint(12345)
+        //      - remotely with 2 decimals --> 1.23 => uint(123)
+        //      - The conversion rate would be 10 ** (4 - 2) = 100
+        //  @dev If you want to send 1.2345 -> (uint 12345), you CANNOT represent that value on the remote,
+        //  you can only display 1.23 -> uint(123).
+        //  @dev To preserve the dust that would otherwise be lost on that conversion,
+        //  we need to unify a denomination that can be represented on ALL chains inside of the OFT mesh
+        uint256 _decimalConversionRate;
+        // Address of an optional contract to inspect both 'message' and 'options'
+        address _msgInspector;
+    }
+
+    // keccak256(abi.encode(uint256(keccak256("layerzero.storage.OFTCore")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant OFTCoreStorageLocation = 0x822492242235517548c4a8cf040400e3c0daf5b82af652ed16dce4fa3ae72800;
+
+    function _getOFTCoreStorage() private pure returns (OFTCoreStorage storage $) {
+        assembly {
+            $.slot := OFTCoreStorageLocation
+        }
+    }
+
+    /**
+     * @dev Initializer.
+     * @param _localDecimals The decimals of the token on the local chain (this chain).
+     * @param _endpoint The address of the LayerZero endpoint.
+     * @param _owner The address of the OFT owner.
+     */
+    function __OFTCore_init(uint8 _localDecimals, address _endpoint, address _owner) internal onlyInitializing {
+        __OApp_init(_endpoint, _owner);
+        __OFTCore_init_unchained(_localDecimals);
+    }
+
+    /**
+     * @dev Initializer.
+     * @param _localDecimals The decimals of the token on the local chain (this chain).
+     */
+    function __OFTCore_init_unchained(uint8 _localDecimals) internal onlyInitializing {
+        if (_localDecimals < sharedDecimals()) revert InvalidLocalDecimals();
+        OFTCoreStorage storage $ = _getOFTCoreStorage();
+        $._decimalConversionRate = 10 ** (_localDecimals - sharedDecimals());
+    }
 
     // @notice Provides a conversion rate when swapping between denominations of SD and LD
     //      - shareDecimals == SD == shared Decimals
@@ -33,26 +101,15 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
     //  you can only display 1.23 -> uint(123).
     //  @dev To preserve the dust that would otherwise be lost on that conversion,
     //  we need to unify a denomination that can be represented on ALL chains inside of the OFT mesh
-    uint256 public immutable decimalConversionRate;
-
-    // @notice Msg types that are used to identify the various OFT operations.
-    // @dev This can be extended in child contracts for non-default oft operations
-    // @dev These values are used in things like combineOptions() in OAppOptionsType3.sol.
-    uint16 public constant SEND = 1;
-    uint16 public constant SEND_AND_CALL = 2;
+    function decimalConversionRate() public view virtual returns (uint256) {
+        OFTCoreStorage storage $ = _getOFTCoreStorage();
+        return $._decimalConversionRate;
+    }
 
     // Address of an optional contract to inspect both 'message' and 'options'
-    address public msgInspector;
-
-    /**
-     * @dev Constructor.
-     * @param _localDecimals The decimals of the token on the local chain (this chain).
-     * @param _endpoint The address of the LayerZero endpoint.
-     * @param _owner The address of the OFT owner.
-     */
-    constructor(uint8 _localDecimals, address _endpoint, address _owner) OAppUpgradeable(_endpoint, _owner) {
-        if (_localDecimals < sharedDecimals()) revert InvalidLocalDecimals();
-        decimalConversionRate = 10 ** (_localDecimals - sharedDecimals());
+    function msgInspector() public view virtual returns (address) {
+        OFTCoreStorage storage $ = _getOFTCoreStorage();
+        return $._msgInspector;
     }
 
     /**
@@ -77,7 +134,8 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
      * @dev Set it to address(0) to disable it, or set it to a contract address to enable it.
      */
     function setMsgInspector(address _msgInspector) public virtual onlyOwner {
-        msgInspector = _msgInspector;
+        OFTCoreStorage storage $ = _getOFTCoreStorage();
+        $._msgInspector = _msgInspector;
         emit MsgInspectorSet(_msgInspector);
     }
 
@@ -110,11 +168,8 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
         // - amountToCreditLD is the amount in local decimals that will be credited to the recipient on the remote OFT instance.
         // @dev The amount credited does NOT always equal the amount the user actually receives.
         // HOWEVER, In the default implementation it is.
-        (uint256 amountToDebitLD, uint256 amountToCreditLD) = _debitView(
-            _sendParam.amountToSendLD,
-            _sendParam.minAmountToCreditLD,
-            _sendParam.dstEid
-        );
+        (uint256 amountToDebitLD, uint256 amountToCreditLD) =
+            _debitView(_sendParam.amountToSendLD, _sendParam.minAmountToCreditLD, _sendParam.dstEid);
         oftReceipt = OFTReceipt(amountToDebitLD, amountToCreditLD);
     }
 
@@ -140,19 +195,12 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
     ) external view virtual returns (MessagingFee memory msgFee) {
         // @dev mock the amount to credit, this is the same operation used in the send().
         // The quote is as similar as possible to the actual send() operation.
-        (, uint256 amountToCreditLD) = _debitView(
-            _sendParam.amountToSendLD,
-            _sendParam.minAmountToCreditLD,
-            _sendParam.dstEid
-        );
+        (, uint256 amountToCreditLD) =
+            _debitView(_sendParam.amountToSendLD, _sendParam.minAmountToCreditLD, _sendParam.dstEid);
 
         // @dev Builds the options and OFT message to quote in the endpoint.
-        (bytes memory message, bytes memory options) = _buildMsgAndOptions(
-            _sendParam,
-            _extraOptions,
-            _composeMsg,
-            amountToCreditLD
-        );
+        (bytes memory message, bytes memory options) =
+            _buildMsgAndOptions(_sendParam, _extraOptions, _composeMsg, amountToCreditLD);
 
         // @dev Calculates the LayerZero fee for the send() operation.
         return _quote(_sendParam.dstEid, message, options, _payInLzToken);
@@ -187,19 +235,12 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
         // @dev Applies the token transfers regarding this send() operation.
         // - amountDebitedLD is the amount in local decimals that was ACTUALLY debited from the sender.
         // - amountToCreditLD is the amount in local decimals that will be credited to the recipient on the remote OFT instance.
-        (uint256 amountDebitedLD, uint256 amountToCreditLD) = _debit(
-            _sendParam.amountToSendLD,
-            _sendParam.minAmountToCreditLD,
-            _sendParam.dstEid
-        );
+        (uint256 amountDebitedLD, uint256 amountToCreditLD) =
+            _debit(_sendParam.amountToSendLD, _sendParam.minAmountToCreditLD, _sendParam.dstEid);
 
         // @dev Builds the options and OFT message to quote in the endpoint.
-        (bytes memory message, bytes memory options) = _buildMsgAndOptions(
-            _sendParam,
-            _extraOptions,
-            _composeMsg,
-            amountToCreditLD
-        );
+        (bytes memory message, bytes memory options) =
+            _buildMsgAndOptions(_sendParam, _extraOptions, _composeMsg, amountToCreditLD);
 
         // @dev Sends the message to the LayerZero endpoint and returns the LayerZero msg receipt.
         msgReceipt = _lzSend(_sendParam.dstEid, message, options, _fee, _refundAddress);
@@ -240,7 +281,9 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
 
         // @dev Optionally inspect the message and options depending if the OApp owner has set a msg inspector.
         // @dev If it fails inspection, needs to revert in the implementation. ie. does not rely on return boolean
-        if (msgInspector != address(0)) IOAppMsgInspector(msgInspector).inspect(message, options);
+        OFTCoreStorage storage $ = _getOFTCoreStorage();
+        address _msgInspector = $._msgInspector;
+        if (_msgInspector != address(0)) IOAppMsgInspector(_msgInspector).inspect(message, options);
     }
 
     /**
@@ -258,7 +301,7 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
         Origin calldata _origin,
         bytes32 _guid,
         bytes calldata _message,
-        address /*_executor*/, // @dev unused in the default implementation.
+        address, /*_executor*/ // @dev unused in the default implementation.
         bytes calldata /*_extraData*/ // @dev unused in the default implementation.
     ) internal virtual override {
         // @dev The src sending chain doesnt know the address length on this chain (potentially non-evm)
@@ -271,19 +314,15 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
 
         if (_message.isComposed()) {
             // @dev Proprietary composeMsg format for the OFT.
-            bytes memory composeMsg = OFTComposeMsgCodec.encode(
-                _origin.nonce,
-                _origin.srcEid,
-                amountReceivedLD,
-                _message.composeMsg()
-            );
+            bytes memory composeMsg =
+                OFTComposeMsgCodec.encode(_origin.nonce, _origin.srcEid, amountReceivedLD, _message.composeMsg());
 
             // @dev Stores the lzCompose payload that will be executed in a separate tx.
             // Standardizes functionality for executing arbitrary contract invocation on some non-evm chains.
             // @dev The off-chain executor will listen and process the msg based on the src-chain-callers compose options passed.
             // @dev The index is used when a OApp needs to compose multiple msgs on lzReceive.
             // For default OFT implementation there is only 1 compose msg per lzReceive, thus its always 0.
-            endpoint.sendCompose(toAddress, _guid, 0 /* the index of the composed message*/, composeMsg);
+            endpoint().sendCompose(toAddress, _guid, 0, /* the index of the composed message*/ composeMsg);
         }
 
         emit OFTReceived(_guid, toAddress, amountToCreditLD, amountReceivedLD);
@@ -322,7 +361,7 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
      * @dev Enables OAppPreCrimeSimulator to check whether a potential Inbound Packet is from a trusted source.
      */
     function isPeer(uint32 _eid, bytes32 _peer) public view virtual override returns (bool) {
-        return peers[_eid] == _peer;
+        return peers(_eid) == _peer;
     }
 
     /**
@@ -334,7 +373,9 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
      * @dev eg. uint(123) with a conversion rate of 100 becomes uint(100).
      */
     function _removeDust(uint256 _amountLD) internal view virtual returns (uint256 amountLD) {
-        return (_amountLD / decimalConversionRate) * decimalConversionRate;
+        OFTCoreStorage storage $ = _getOFTCoreStorage();
+        uint256 _decimalConversionRate = $._decimalConversionRate;
+        return (_amountLD / _decimalConversionRate) * _decimalConversionRate;
     }
 
     /**
@@ -343,7 +384,8 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
      * @return amountLD The amount in local decimals.
      */
     function _toLD(uint64 _amountSD) internal view virtual returns (uint256 amountLD) {
-        return _amountSD * decimalConversionRate;
+        OFTCoreStorage storage $ = _getOFTCoreStorage();
+        return _amountSD * $._decimalConversionRate;
     }
 
     /**
@@ -352,7 +394,8 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
      * @return amountSD The amount in shared decimals.
      */
     function _toSD(uint256 _amountLD) internal view virtual returns (uint64 amountSD) {
-        return uint64(_amountLD / decimalConversionRate);
+        OFTCoreStorage storage $ = _getOFTCoreStorage();
+        return uint64(_amountLD / $._decimalConversionRate);
     }
 
     /**
@@ -365,11 +408,12 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
      *
      * @dev This is where things like fees would be calculated and deducted from the amount to credit on the remote.
      */
-    function _debitView(
-        uint256 _amountToSendLD,
-        uint256 _minAmountToCreditLD,
-        uint32 /*_dstEid*/
-    ) internal view virtual returns (uint256 amountToDebitLD, uint256 amountToCreditLD) {
+    function _debitView(uint256 _amountToSendLD, uint256 _minAmountToCreditLD, uint32 /*_dstEid*/ )
+        internal
+        view
+        virtual
+        returns (uint256 amountToDebitLD, uint256 amountToCreditLD)
+    {
         // @dev Remove the dust so nothing is lost on the conversion between chains with different decimals for the token.
         amountToDebitLD = _removeDust(_amountToSendLD);
         // @dev The amount to credit is the same as the amount to debit in the default implementation.
@@ -389,11 +433,11 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
      * @return amountDebitedLD The amount ACTUALLY debited in local decimals.
      * @return amountToCreditLD The amount to credit in local decimals on the remote.
      */
-    function _debit(
-        uint256 _amountToSendLD,
-        uint256 _minAmountToCreditLD,
-        uint32 _dstEid
-    ) internal virtual returns (uint256 amountDebitedLD, uint256 amountToCreditLD) {
+    function _debit(uint256 _amountToSendLD, uint256 _minAmountToCreditLD, uint32 _dstEid)
+        internal
+        virtual
+        returns (uint256 amountDebitedLD, uint256 amountToCreditLD)
+    {
         // @dev Caller can indicate it wants to use push vs. pull method by passing an _amountToSendLD of 0.
         if (_amountToSendLD > 0) {
             // @dev Pull the tokens from the caller.
@@ -416,11 +460,10 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
      * @dev This is used when the OFT pulls the tokens from the caller.
      * ie. A user sends has approved the OFT to spend on its behalf.
      */
-    function _debitSender(
-        uint256 _amountToSendLD,
-        uint256 _minAmountToCreditLD,
-        uint32 _dstEid
-    ) internal virtual returns (uint256 amountDebitedLD, uint256 amountToCreditLD);
+    function _debitSender(uint256 _amountToSendLD, uint256 _minAmountToCreditLD, uint32 _dstEid)
+        internal
+        virtual
+        returns (uint256 amountDebitedLD, uint256 amountToCreditLD);
 
     /**
      * @dev Internal function to perform a debit operation for this chain.
@@ -433,10 +476,10 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
      * @dev This is used when the OFT is the recipient of a push operation.
      * ie. A user sends tokens direct to the OFT contract address.
      */
-    function _debitThis(
-        uint256 _minAmountToCreditLD,
-        uint32 _dstEid
-    ) internal virtual returns (uint256 amountDebitedLD, uint256 amountToCreditLD);
+    function _debitThis(uint256 _minAmountToCreditLD, uint32 _dstEid)
+        internal
+        virtual
+        returns (uint256 amountDebitedLD, uint256 amountToCreditLD);
 
     /**
      * @dev Internal function to perform a credit operation.
@@ -448,9 +491,8 @@ abstract contract OFTCoreUpgradeable is IOFT, OAppUpgradeable, OAppPreCrimeSimul
      * @dev Defined here but are intended to be override depending on the OFT implementation.
      * @dev Depending on OFT implementation the _amountToCreditLD could differ from the amountReceivedLD.
      */
-    function _credit(
-        address _to,
-        uint256 _amountToCreditLD,
-        uint32 _srcEid
-    ) internal virtual returns (uint256 amountReceivedLD);
+    function _credit(address _to, uint256 _amountToCreditLD, uint32 _srcEid)
+        internal
+        virtual
+        returns (uint256 amountReceivedLD);
 }

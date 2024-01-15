@@ -2,9 +2,14 @@
 
 pragma solidity ^0.8.22;
 
-import { SafeERC20, IERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { MessagingParams, MessagingFee, MessagingReceipt } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
-import { OAppCoreUpgradeable } from "./OAppCoreUpgradeable.sol";
+import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {
+    MessagingParams,
+    MessagingFee,
+    MessagingReceipt,
+    ILayerZeroEndpointV2
+} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
+import {OAppCoreUpgradeable} from "./OAppCoreUpgradeable.sol";
 
 /**
  * @title OAppSender
@@ -20,6 +25,10 @@ abstract contract OAppSenderUpgradeable is OAppCoreUpgradeable {
     // @dev The version of the OAppSender implementation.
     // @dev Version is bumped when changes are made to this contract.
     uint64 internal constant SENDER_VERSION = 1;
+
+    function __OAppSender_init(address _endpoint, address _owner) internal onlyInitializing {
+        __OAppCore_init(_endpoint, _owner);
+    }
 
     /**
      * @notice Retrieves the OApp version information.
@@ -44,17 +53,15 @@ abstract contract OAppSenderUpgradeable is OAppCoreUpgradeable {
      *      - nativeFee: The native fee for the message.
      *      - lzTokenFee: The LZ token fee for the message.
      */
-    function _quote(
-        uint32 _dstEid,
-        bytes memory _message,
-        bytes memory _options,
-        bool _payInLzToken
-    ) internal view virtual returns (MessagingFee memory fee) {
-        return
-            endpoint.quote(
-                MessagingParams(_dstEid, _getPeerOrRevert(_dstEid), _message, _options, _payInLzToken),
-                address(this)
-            );
+    function _quote(uint32 _dstEid, bytes memory _message, bytes memory _options, bool _payInLzToken)
+        internal
+        view
+        virtual
+        returns (MessagingFee memory fee)
+    {
+        return endpoint().quote(
+            MessagingParams(_dstEid, _getPeerOrRevert(_dstEid), _message, _options, _payInLzToken), address(this)
+        );
     }
 
     /**
@@ -82,12 +89,11 @@ abstract contract OAppSenderUpgradeable is OAppCoreUpgradeable {
         uint256 messageValue = _payNative(_fee.nativeFee);
         if (_fee.lzTokenFee > 0) _payLzToken(_fee.lzTokenFee);
 
-        return
+        return endpoint()
             // solhint-disable-next-line check-send-result
-            endpoint.send{ value: messageValue }(
-                MessagingParams(_dstEid, _getPeerOrRevert(_dstEid), _message, _options, _fee.lzTokenFee > 0),
-                _refundAddress
-            );
+            .send{value: messageValue}(
+            MessagingParams(_dstEid, _getPeerOrRevert(_dstEid), _message, _options, _fee.lzTokenFee > 0), _refundAddress
+        );
     }
 
     /**
@@ -115,10 +121,11 @@ abstract contract OAppSenderUpgradeable is OAppCoreUpgradeable {
      */
     function _payLzToken(uint256 _lzTokenFee) internal virtual {
         // @dev Cannot cache the token because it is not immutable in the endpoint.
-        address lzToken = endpoint.lzToken();
+        ILayerZeroEndpointV2 _endpoint = endpoint();
+        address lzToken = _endpoint.lzToken();
         if (lzToken == address(0)) revert LzTokenUnavailable();
 
         // Pay LZ token fee by sending tokens to the endpoint.
-        IERC20(lzToken).safeTransferFrom(msg.sender, address(endpoint), _lzTokenFee);
+        IERC20(lzToken).safeTransferFrom(msg.sender, address(_endpoint), _lzTokenFee);
     }
 }

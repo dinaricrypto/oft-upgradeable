@@ -2,28 +2,58 @@
 
 pragma solidity ^0.8.22;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { IOAppCore, ILayerZeroEndpointV2 } from "LayerZero-v2/oapp/contracts/oapp/interfaces/IOAppCore.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IOAppCore, ILayerZeroEndpointV2} from "LayerZero-v2/oapp/contracts/oapp/interfaces/IOAppCore.sol";
 
 /**
  * @title OAppCore
  * @dev Abstract contract implementing the IOAppCore interface with basic OApp configurations.
  */
-abstract contract OAppCoreUpgradeable is IOAppCore, Ownable {
-    // The LayerZero endpoint associated with the given OApp
-    ILayerZeroEndpointV2 public immutable endpoint;
+abstract contract OAppCoreUpgradeable is IOAppCore, Initializable, OwnableUpgradeable {
+    struct OAppCoreStorage {
+        // The address of the LayerZero endpoint associated with the given OApp
+        ILayerZeroEndpointV2 _endpoint;
+        // Mapping to store peers associated with corresponding endpoints
+        mapping(uint32 => bytes32) _peers;
+    }
 
-    // Mapping to store peers associated with corresponding endpoints
-    mapping(uint32 eid => bytes32 peer) public peers;
+    // keccak256(abi.encode(uint256(keccak256("layerzero.storage.OAppCore")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant OAppCoreStorageLocation =
+        0x58caa5f4171d954fbd20b1d134833615ec3c90ab38e1c4443a45151b8ad01600;
+
+    function _getOAppCoreStorage() private pure returns (OAppCoreStorage storage $) {
+        assembly {
+            $.slot := OAppCoreStorageLocation
+        }
+    }
 
     /**
-     * @dev Constructor to initialize the OAppCore with the provided endpoint and owner.
+     * @dev Initialize the OAppCore with the provided endpoint and owner.
      * @param _endpoint The address of the LOCAL Layer Zero endpoint.
      * @param _owner The address of the owner of the OAppCore.
      */
-    constructor(address _endpoint, address _owner) Ownable(_owner) {
-        endpoint = ILayerZeroEndpointV2(_endpoint);
-        endpoint.setDelegate(_owner); // @dev By default, the owner is the delegate
+    function __OAppCore_init(address _endpoint, address _owner) internal onlyInitializing {
+        __Ownable_init(_owner);
+        __OAppCore_init_unchained(_endpoint, _owner);
+    }
+
+    function __OAppCore_init_unchained(address _endpoint, address _owner) internal onlyInitializing {
+        OAppCoreStorage storage $ = _getOAppCoreStorage();
+        $._endpoint = ILayerZeroEndpointV2(_endpoint);
+        $._endpoint.setDelegate(_owner); // @dev By default, the owner is the delegate
+    }
+
+    // The LayerZero endpoint associated with the given OApp
+    function endpoint() public view virtual returns (ILayerZeroEndpointV2) {
+        OAppCoreStorage storage $ = _getOAppCoreStorage();
+        return $._endpoint;
+    }
+
+    // Mapping to store peers associated with corresponding endpoints
+    function peers(uint32 eid) public view virtual returns (bytes32 peer) {
+        OAppCoreStorage storage $ = _getOAppCoreStorage();
+        return $._peers[eid];
     }
 
     /**
@@ -37,7 +67,8 @@ abstract contract OAppCoreUpgradeable is IOAppCore, Ownable {
      * @dev Peer is a bytes32 to accommodate non-evm chains.
      */
     function setPeer(uint32 _eid, bytes32 _peer) public virtual onlyOwner {
-        peers[_eid] = _peer;
+        OAppCoreStorage storage $ = _getOAppCoreStorage();
+        $._peers[_eid] = _peer;
         emit PeerSet(_eid, _peer);
     }
 
@@ -48,7 +79,8 @@ abstract contract OAppCoreUpgradeable is IOAppCore, Ownable {
      * @return peer The address of the peer associated with the specified endpoint.
      */
     function _getPeerOrRevert(uint32 _eid) internal view virtual returns (bytes32) {
-        bytes32 peer = peers[_eid];
+        OAppCoreStorage storage $ = _getOAppCoreStorage();
+        bytes32 peer = $._peers[_eid];
         if (peer == bytes32(0)) revert NoPeer(_eid);
         return peer;
     }
@@ -62,6 +94,7 @@ abstract contract OAppCoreUpgradeable is IOAppCore, Ownable {
      * @dev Defaults to the owner of the OApp.
      */
     function setDelegate(address _delegate) public onlyOwner {
-        endpoint.setDelegate(_delegate);
+        OAppCoreStorage storage $ = _getOAppCoreStorage();
+        $._endpoint.setDelegate(_delegate);
     }
 }

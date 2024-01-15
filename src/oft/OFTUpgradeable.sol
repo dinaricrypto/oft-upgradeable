@@ -2,27 +2,28 @@
 
 pragma solidity ^0.8.22;
 
-import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import { OFTCoreUpgradeable } from "./OFTCoreUpgradeable.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {OFTCoreUpgradeable} from "./OFTCoreUpgradeable.sol";
 
 /**
  * @title OFT Contract
  * @dev OFT is an ERC-20 token that extends the functionality of the OFTCore contract.
  */
-contract OFTUpgradeable is OFTCoreUpgradeable, ERC20 {
+contract OFTUpgradeable is OFTCoreUpgradeable, ERC20Upgradeable {
     /**
-     * @dev Constructor for the OFT contract.
+     * @dev Initializer for the OFT contract.
      * @param _name The name of the OFT.
      * @param _symbol The symbol of the OFT.
      * @param _lzEndpoint The LayerZero endpoint address.
      * @param _owner The owner of the contract.
      */
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        address _lzEndpoint,
-        address _owner
-    ) ERC20(_name, _symbol) OFTCoreUpgradeable(decimals(), _lzEndpoint, _owner) {}
+    function initialize(string memory _name, string memory _symbol, address _lzEndpoint, address _owner)
+        external
+        initializer
+    {
+        __ERC20_init(_name, _symbol);
+        __OFTCore_init(decimals(), _lzEndpoint, _owner);
+    }
 
     /**
      * @dev Retrieves the OFT contract version.
@@ -57,11 +58,12 @@ contract OFTUpgradeable is OFTCoreUpgradeable, ERC20 {
      * @return amountDebitedLD The amount of tokens ACTUALLY debited in local decimals.
      * @return amountToCreditLD The amount of tokens to credit in local decimals.
      */
-    function _debitSender(
-        uint256 _amountToSendLD,
-        uint256 _minAmountToCreditLD,
-        uint32 _dstEid
-    ) internal virtual override returns (uint256 amountDebitedLD, uint256 amountToCreditLD) {
+    function _debitSender(uint256 _amountToSendLD, uint256 _minAmountToCreditLD, uint32 _dstEid)
+        internal
+        virtual
+        override
+        returns (uint256 amountDebitedLD, uint256 amountToCreditLD)
+    {
         (amountDebitedLD, amountToCreditLD) = _debitView(_amountToSendLD, _minAmountToCreditLD, _dstEid);
 
         // @dev In NON-default OFT, amountDebited could be 100, with a 10% fee, the credited amount is 90,
@@ -78,10 +80,12 @@ contract OFTUpgradeable is OFTCoreUpgradeable, ERC20 {
      * @return amountDebitedLD The amount of tokens ACTUALLY debited in local decimals.
      * @return amountToCreditLD The amount of tokens to credit in local decimals.
      */
-    function _debitThis(
-        uint256 _minAmountToReceiveLD,
-        uint32 _dstEid
-    ) internal virtual override returns (uint256 amountDebitedLD, uint256 amountToCreditLD) {
+    function _debitThis(uint256 _minAmountToReceiveLD, uint32 _dstEid)
+        internal
+        virtual
+        override
+        returns (uint256 amountDebitedLD, uint256 amountToCreditLD)
+    {
         // @dev This is the push method, where at any point in the transaction, the OFT receives tokens and they can be sent by the caller.
         // @dev This SHOULD be done atomically, otherwise any caller can spend tokens that are owned by the contract.
         // @dev In the NON-default case where fees are stored in the contract, there should be a value reserved via a global state.
@@ -103,11 +107,12 @@ contract OFTUpgradeable is OFTCoreUpgradeable, ERC20 {
      * @dev _srcEid The source chain ID.
      * @return amountReceivedLD The amount of tokens ACTUALLY received in local decimals.
      */
-    function _credit(
-        address _to,
-        uint256 _amountToCreditLD,
-        uint32 /*_srcEid*/
-    ) internal virtual override returns (uint256 amountReceivedLD) {
+    function _credit(address _to, uint256 _amountToCreditLD, uint32 /*_srcEid*/ )
+        internal
+        virtual
+        override
+        returns (uint256 amountReceivedLD)
+    {
         // @dev Default OFT mints on dst.
         _mint(_to, _amountToCreditLD);
         // @dev In the case of NON-default OFT, the amountToCreditLD MIGHT not == amountReceivedLD.

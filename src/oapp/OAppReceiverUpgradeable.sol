@@ -2,8 +2,10 @@
 
 pragma solidity ^0.8.22;
 
-import { ILayerZeroReceiver, Origin } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroReceiver.sol";
-import { OAppCoreUpgradeable } from "./OAppCoreUpgradeable.sol";
+import {
+    ILayerZeroReceiver, Origin
+} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroReceiver.sol";
+import {OAppCoreUpgradeable} from "./OAppCoreUpgradeable.sol";
 
 /**
  * @title OAppReceiver
@@ -16,6 +18,10 @@ abstract contract OAppReceiverUpgradeable is ILayerZeroReceiver, OAppCoreUpgrade
     // @dev The version of the OAppReceiver implementation.
     // @dev Version is bumped when changes are made to this contract.
     uint64 internal constant RECEIVER_VERSION = 1;
+
+    function __OAppReceiver_init(address _endpoint, address _owner) internal onlyInitializing {
+        __OAppCore_init(_endpoint, _owner);
+    }
 
     /**
      * @notice Retrieves the OApp version information.
@@ -40,7 +46,7 @@ abstract contract OAppReceiverUpgradeable is ILayerZeroReceiver, OAppCoreUpgrade
      * Can be overridden by the OApp if there is other logic to determine this.
      */
     function allowInitializePath(Origin calldata origin) public view virtual returns (bool) {
-        return peers[origin.srcEid] == origin.sender;
+        return peers(origin.srcEid) == origin.sender;
     }
 
     /**
@@ -54,7 +60,7 @@ abstract contract OAppReceiverUpgradeable is ILayerZeroReceiver, OAppCoreUpgrade
      * @dev This is also enforced by the OApp.
      * @dev By default this is NOT enabled. ie. nextNonce is hardcoded to return 0.
      */
-    function nextNonce(uint32 /*_srcEid*/, bytes32 /*_sender*/) public view virtual returns (uint64 nonce) {
+    function nextNonce(uint32, /*_srcEid*/ bytes32 /*_sender*/ ) public view virtual returns (uint64 nonce) {
         return 0;
     }
 
@@ -79,7 +85,7 @@ abstract contract OAppReceiverUpgradeable is ILayerZeroReceiver, OAppCoreUpgrade
         bytes calldata _extraData
     ) public payable virtual {
         // Ensures that only the endpoint can attempt to lzReceive() messages to this OApp.
-        if (address(endpoint) != msg.sender) revert OnlyEndpoint(msg.sender);
+        if (address(endpoint()) != msg.sender) revert OnlyEndpoint(msg.sender);
 
         // Ensure that the sender matches the expected peer for the source endpoint.
         if (_getPeerOrRevert(_origin.srcEid) != _origin.sender) revert OnlyPeer(_origin.srcEid, _origin.sender);
