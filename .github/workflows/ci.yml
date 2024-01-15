@@ -79,7 +79,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "yarn"
   
       - name: Enable Node Corepack
         run: corepack enable
@@ -119,7 +118,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "yarn"
   
       - name: Enable Node Corepack
         run: corepack enable
