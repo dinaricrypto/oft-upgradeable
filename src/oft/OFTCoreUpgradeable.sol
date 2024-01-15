@@ -4,7 +4,7 @@ pragma solidity ^0.8.22;
 
 import {OAppUpgradeable, Origin} from "../oapp/OAppUpgradeable.sol";
 import {OAppOptionsType3Upgradeable} from "../oapp/libs/OAppOptionsType3Upgradeable.sol";
-import {IOAppMsgInspector} from "LayerZero-v2/oapp/contracts/oapp/interfaces/IOAppMsgInspector.sol";
+import {IOAppMsgInspector} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/interfaces/IOAppMsgInspector.sol";
 
 import {OAppPreCrimeSimulatorUpgradeable} from "../precrime/OAppPreCrimeSimulatorUpgradeable.sol";
 
@@ -16,9 +16,9 @@ import {
     OFTFeeDetail,
     MessagingReceipt,
     MessagingFee
-} from "LayerZero-v2/oapp/contracts/oft/interfaces/IOFT.sol";
-import {OFTMsgCodec} from "LayerZero-v2/oapp/contracts/oft/libs/OFTMsgCodec.sol";
-import {OFTComposeMsgCodec} from "LayerZero-v2/oapp/contracts/oft/libs/OFTComposeMsgCodec.sol";
+} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oft/interfaces/IOFT.sol";
+import {OFTMsgCodec} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oft/libs/OFTMsgCodec.sol";
+import {OFTComposeMsgCodec} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oft/libs/OFTComposeMsgCodec.sol";
 
 /**
  * @title OFTCore

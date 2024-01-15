@@ -9,9 +9,25 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dinari/oft-upgradeable@workspace:."
   dependencies:
+    "@layerzerolabs/lz-evm-oapp-v2": ^2.0.11
     "@layerzerolabs/lz-evm-protocol-v2": ^2.0.11
   languageName: unknown
   linkType: soft
+
+"@layerzerolabs/lz-evm-oapp-v2@npm:^2.0.11":
+  version: 2.0.11
+  resolution: "@layerzerolabs/lz-evm-oapp-v2@npm:2.0.11"
+  peerDependencies:
+    "@layerzerolabs/lz-evm-messagelib-v2": ^2.0.11
+    "@layerzerolabs/lz-evm-protocol-v2": ^2.0.11
+    "@layerzerolabs/lz-evm-v1-0.7": ^2.0.11
+    "@openzeppelin/contracts": ^4.8.1
+    "@openzeppelin/contracts-upgradeable": ^4.8.1
+    hardhat-deploy: ^0.11.44
+    solidity-bytes-utils: ^0.8.0
+  checksum: ed9136e7b241d13a6310c13643881a69fda441acfde2bacc2115482fb9bd50f1a9d5a58ebbd06bbc43ec693dc331ec998e947b174c8e10b3d65ff0f5fba0571a
+  languageName: node
+  linkType: hard
 
 "@layerzerolabs/lz-evm-protocol-v2@npm:^2.0.11":
   version: 2.0.11

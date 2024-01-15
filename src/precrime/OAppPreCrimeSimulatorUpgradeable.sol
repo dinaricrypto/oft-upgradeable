@@ -4,12 +4,12 @@ pragma solidity ^0.8.22;
 
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {IPreCrime} from "LayerZero-v2/oapp/contracts/precrime/interfaces/IPreCrime.sol";
+import {IPreCrime} from "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/interfaces/IPreCrime.sol";
 import {
     IOAppPreCrimeSimulator,
     InboundPacket,
     Origin
-} from "LayerZero-v2/oapp/contracts/precrime/interfaces/IOAppPreCrimeSimulator.sol";
+} from "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/interfaces/IOAppPreCrimeSimulator.sol";
 
 /**
  * @title OAppPreCrimeSimulator

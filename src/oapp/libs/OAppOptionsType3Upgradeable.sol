@@ -5,8 +5,9 @@ pragma solidity ^0.8.22;
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {
-    IOAppOptionsType3, EnforcedOptionParam
-} from "LayerZero-v2/oapp/contracts/oapp/interfaces/IOAppOptionsType3.sol";
+    IOAppOptionsType3,
+    EnforcedOptionParam
+} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/interfaces/IOAppOptionsType3.sol";
 
 /**
  * @title OAppOptionsType3
