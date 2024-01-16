@@ -13,8 +13,6 @@ abstract contract AddressSizeConfig is Ownable {
     error InvalidAddressSize();
     error AddressSizeAlreadySet();
 
-    constructor() Ownable(msg.sender) {}
-
     function setAddressSize(uint16 _eid, uint256 _size) external onlyOwner {
         if (_size > 32) revert InvalidAddressSize();
         if (addressSizes[_eid] != 0) revert AddressSizeAlreadySet();

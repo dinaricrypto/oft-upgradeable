@@ -38,7 +38,7 @@ abstract contract WorkerUpgradeable is Initializable, AccessControlUpgradeable, 
         address[] memory _admins
     ) internal onlyInitializing {
         __Context_init_unchained();
-        __AccessControl_init_unchained(msg.sender);
+        __AccessControl_init_unchained();
         __Pausable_init_unchained();
         __Worker_init_unchained(_messageLibs, _priceFeed, _defaultMultiplierBps, _roleAdmin, _admins);
     }
@@ -155,21 +155,21 @@ abstract contract WorkerUpgradeable is Initializable, AccessControlUpgradeable, 
     /// @dev overrides AccessControl to allow for counting of allowlistSize
     /// @param _role role to grant
     /// @param _account address to grant role to
-    function _grantRole(bytes32 _role, address _account) internal override {
+    function _grantRole(bytes32 _role, address _account) internal override returns (bool) {
         if (_role == ALLOWLIST && !hasRole(_role, _account)) {
             ++allowlistSize;
         }
-        super._grantRole(_role, _account);
+        return super._grantRole(_role, _account);
     }
 
     /// @dev overrides AccessControl to allow for counting of allowlistSize
     /// @param _role role to revoke
     /// @param _account address to revoke role from
-    function _revokeRole(bytes32 _role, address _account) internal override {
+    function _revokeRole(bytes32 _role, address _account) internal override returns (bool) {
         if (_role == ALLOWLIST && hasRole(_role, _account)) {
             --allowlistSize;
         }
-        super._revokeRole(_role, _account);
+        return super._revokeRole(_role, _account);
     }
 
     /// @dev overrides AccessControl to disable renouncing of roles

@@ -153,7 +153,7 @@ contract OFTAdapterUpgradeable is OFTCoreUpgradeable {
         return _amountToCreditLD;
     }
 
-    function _increaseOutboundAmount(uint256 _amount) internal virtual override {
+    function _increaseOutboundAmount(uint256 _amount) internal virtual {
         OFTAdapterStorage storage $ = _getOFTAdapterStorage();
         $._outboundAmount += _amount;
     }

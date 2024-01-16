@@ -59,7 +59,7 @@ abstract contract SendLibBase is MessageLibBase, Ownable {
         uint32 _localEid,
         uint256 _treasuryGasLimit,
         uint256 _treasuryNativeFeeCap
-    ) MessageLibBase(_endpoint, _localEid) Ownable(msg.sender) {
+    ) MessageLibBase(_endpoint, _localEid) {
         treasuryGasLimit = _treasuryGasLimit;
         treasuryNativeFeeCap = _treasuryNativeFeeCap;
     }

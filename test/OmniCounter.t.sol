@@ -8,7 +8,7 @@ import {Errors} from "@layerzerolabs/lz-evm-protocol-v2/contracts/libs/Errors.so
 
 import {OptionsBuilder} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/libs/OptionsBuilder.sol";
 import {OmniCounter, MsgCodec} from "../src/oapp/examples/OmniCounter.sol";
-import {OmniCounterPreCrime} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/examples/OmniCounterPreCrime.sol";
+import {OmniCounterPreCrime} from "../src/oapp/examples/OmniCounterPreCrime.sol";
 import {PreCrimePeer} from "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/interfaces/IPreCrime.sol";
 
 import {TestHelper} from "./TestHelper.sol";

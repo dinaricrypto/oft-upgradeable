@@ -2,6 +2,8 @@
 
 pragma solidity ^0.8.22;
 
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+
 import { Packet } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ISendLib.sol";
 
 import { ExecutorConfig, WorkerOptions } from "../../SendLibBase.sol";
@@ -34,6 +36,7 @@ contract SendUln301 is SendUlnBase, SendLibBaseE1 {
             _localEid,
             _treasuryFeeHandler
         )
+        Ownable(msg.sender)
     {}
 
     // ============================ OnlyEndpoint ===================================

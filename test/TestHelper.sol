@@ -21,7 +21,7 @@ import {ILayerZeroPriceFeed} from "../messagelib/interfaces/ILayerZeroPriceFeed.
 import {IReceiveUlnE2} from "../messagelib/uln/interfaces/IReceiveUlnE2.sol";
 import {ReceiveUln302} from "../messagelib/uln/uln302/ReceiveUln302.sol";
 import {IMessageLib} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessageLib.sol";
-import {EndpointV2} from "@layerzerolabs/lz-evm-protocol-v2/contracts/EndpointV2.sol";
+import {EndpointV2} from "../protocol/contracts/EndpointV2.sol";
 import {ExecutorOptions} from "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/ExecutorOptions.sol";
 import {PacketV1Codec} from "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/PacketV1Codec.sol";
 import {Origin} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";

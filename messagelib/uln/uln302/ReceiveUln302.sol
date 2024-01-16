@@ -2,6 +2,8 @@
 
 pragma solidity ^0.8.22;
 
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+
 import { PacketV1Codec } from "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/PacketV1Codec.sol";
 import { SetConfigParam } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessageLibManager.sol";
 import { ILayerZeroEndpointV2, Origin } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
@@ -21,7 +23,7 @@ contract ReceiveUln302 is IReceiveUlnE2, ReceiveUlnBase, ReceiveLibBaseE2 {
 
     error InvalidConfigType(uint32 configType);
 
-    constructor(address _endpoint) ReceiveLibBaseE2(_endpoint) {}
+    constructor(address _endpoint) ReceiveLibBaseE2(_endpoint) Ownable(msg.sender) {}
 
     function supportsInterface(bytes4 _interfaceId) public view override returns (bool) {
         return _interfaceId == type(IReceiveUlnE2).interfaceId || super.supportsInterface(_interfaceId);

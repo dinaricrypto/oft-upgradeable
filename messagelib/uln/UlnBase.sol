@@ -44,8 +44,6 @@ abstract contract UlnBase is Ownable {
     event DefaultUlnConfigsSet(SetDefaultUlnConfigParam[] params);
     event UlnConfigSet(address oapp, uint32 eid, UlnConfig config);
 
-    constructor() Ownable(msg.sender) {}
-
     // ============================ OnlyOwner ===================================
 
     /// @dev about the DEFAULT ULN config

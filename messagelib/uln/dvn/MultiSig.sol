@@ -88,7 +88,7 @@ abstract contract MultiSig {
         address lastSigner = address(0); // There cannot be a signer with address 0.
         for (uint256 i = 0; i < quorum; i++) {
             bytes calldata signature = _signatures[i * 65:(i + 1) * 65];
-            (address currentSigner, ECDSA.RecoverError error) = ECDSA.tryRecover(messageDigest, signature);
+            (address currentSigner, ECDSA.RecoverError error, bytes32 errorArg) = ECDSA.tryRecover(messageDigest, signature);
 
             if (error != ECDSA.RecoverError.NoError) return (false, Errors.SignatureError);
             if (currentSigner <= lastSigner) return (false, Errors.DuplicatedSigner); // prevent duplicate signatures

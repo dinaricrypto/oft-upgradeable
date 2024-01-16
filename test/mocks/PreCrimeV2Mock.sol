@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {PreCrimePeer} from "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/interfaces/IPreCrime.sol";
 import {IOAppPreCrimeSimulator} from
     "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/interfaces/IOAppPreCrimeSimulator.sol";
-import {PreCrime} from "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/PreCrime.sol";
+import {PreCrime} from "../../src/precrime/PreCrime.sol";
 import {InboundPacket} from "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/libs/Packet.sol";
 
 import {PreCrimeV2SimulatorMock} from "./PreCrimeV2SimulatorMock.sol";
