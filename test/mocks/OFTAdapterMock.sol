@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import {OFTAdapterUpgradeable} from "../../contracts/oft/OFTAdapterUpgradeable.sol";
+import {OFTAdapterUpgradeable} from "../../src/oft/OFTAdapterUpgradeable.sol";
 
 contract OFTAdapterMock is OFTAdapterUpgradeable {
     // @dev expose internal functions for testing purposes

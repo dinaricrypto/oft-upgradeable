@@ -4,12 +4,12 @@ pragma solidity ^0.8.22;
 import {OptionsBuilder} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/libs/OptionsBuilder.sol";
 
 import {OFTMock} from "./mocks/OFTMock.sol";
-import {MessagingFee, MessagingReceipt} from "../contracts/oft/OFTCoreUpgradeable.sol";
+import {MessagingFee, MessagingReceipt} from "../src/oft/OFTCoreUpgradeable.sol";
 import {OFTAdapterMock} from "./mocks/OFTAdapterMock.sol";
 import {ERC20Mock} from "./mocks/ERC20Mock.sol";
 import {OFTComposerMock} from "./mocks/OFTComposerMock.sol";
 import {OFTInspectorMock, IOAppMsgInspector} from "./mocks/OFTInspectorMock.sol";
-import {IOAppOptionsType3, EnforcedOptionParam} from "../contracts/oapp/libs/OAppOptionsType3Upgradeable.sol";
+import {IOAppOptionsType3, EnforcedOptionParam} from "../src/oapp/libs/OAppOptionsType3Upgradeable.sol";
 
 import {OFTMsgCodec} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oft/libs/OFTMsgCodec.sol";
 import {OFTComposeMsgCodec} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oft/libs/OFTComposeMsgCodec.sol";

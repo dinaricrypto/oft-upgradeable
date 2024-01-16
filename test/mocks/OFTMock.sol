@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import {OFTUpgradeable} from "../../contracts/oft/OFTUpgradeable.sol";
-import {SendParam} from "../../contracts/oft/OFTCoreUpgradeable.sol";
+import {OFTUpgradeable} from "../../src/oft/OFTUpgradeable.sol";
+import {SendParam} from "../../src/oft/OFTCoreUpgradeable.sol";
 
 contract OFTMock is OFTUpgradeable {
     function mint(address _to, uint256 _amount) public {

@@ -26,7 +26,7 @@ import {ExecutorOptions} from "@layerzerolabs/lz-evm-protocol-v2/contracts/messa
 import {PacketV1Codec} from "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/PacketV1Codec.sol";
 import {Origin} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 
-import {OAppUpgradeable} from "../contracts/oapp/OAppUpgradeable.sol";
+import {OAppUpgradeable} from "../src/oapp/OAppUpgradeable.sol";
 import {OptionsBuilder} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/libs/OptionsBuilder.sol";
 
 import {OptionsHelper} from "./OptionsHelper.sol";

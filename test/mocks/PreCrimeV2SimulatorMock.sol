@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Origin} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 
-import {OAppPreCrimeSimulatorUpgradeable} from "../../contracts/precrime/OAppPreCrimeSimulatorUpgradeable.sol";
+import {OAppPreCrimeSimulatorUpgradeable} from "../../src/precrime/OAppPreCrimeSimulatorUpgradeable.sol";
 
 contract PreCrimeV2SimulatorMock is OAppPreCrimeSimulatorUpgradeable {
     struct PreCrimeV2SimulatorMockStorage {

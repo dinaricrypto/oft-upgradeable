@@ -4,8 +4,8 @@ pragma solidity ^0.8.15;
 
 import {Origin} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 
-import {IPreCrime, PreCrimePeer} from "../contracts/precrime/interfaces/IPreCrime.sol";
-import {InboundPacket} from "../contracts/precrime/libs/Packet.sol";
+import {IPreCrime, PreCrimePeer} from "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/interfaces/IPreCrime.sol";
+import {InboundPacket} from "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/libs/Packet.sol";
 
 import {TestHelper} from "./TestHelper.sol";
 import {PreCrimeV2Mock} from "./mocks/PreCrimeV2Mock.sol";
