@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.22;
 
-import {ExecutorFeeLib} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/ExecutorFeeLib.sol";
+import {ExecutorFeeLib} from "../../messagelib/ExecutorFeeLib.sol";
 
 contract ExecutorFeeLibMock is ExecutorFeeLib {
     constructor() ExecutorFeeLib(1e18) {}

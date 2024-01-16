@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import {ExecutorOptions} from "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/ExecutorOptions.sol";
-import {UlnOptions} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/libs/UlnOptions.sol";
+import {UlnOptions} from "../../messagelib/uln/libs/UlnOptions.sol";
 
 contract UlnOptionsMock {
     using UlnOptions for bytes;

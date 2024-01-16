@@ -6,20 +6,20 @@ import {Test} from "forge-std/Test.sol";
 import {DoubleEndedQueue} from "@openzeppelin/contracts/utils/structs/DoubleEndedQueue.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-import {UlnConfig, SetDefaultUlnConfigParam} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/UlnBase.sol";
+import {UlnConfig, SetDefaultUlnConfigParam} from "../messagelib/uln/UlnBase.sol";
 import {
     SetDefaultExecutorConfigParam,
     ExecutorConfig
-} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/SendLibBase.sol";
-import {ReceiveUln302} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/uln302/ReceiveUln302.sol";
-import {DVN, ExecuteParam} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/dvn/DVN.sol";
-import {DVNFeeLib} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/dvn/DVNFeeLib.sol";
-import {IExecutor} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/interfaces/IExecutor.sol";
-import {Executor} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/Executor.sol";
-import {PriceFeed} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/PriceFeed.sol";
-import {ILayerZeroPriceFeed} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/interfaces/ILayerZeroPriceFeed.sol";
-import {IReceiveUlnE2} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/interfaces/IReceiveUlnE2.sol";
-import {ReceiveUln302} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/uln302/ReceiveUln302.sol";
+} from "../messagelib/SendLibBase.sol";
+import {ReceiveUln302} from "../messagelib/uln/uln302/ReceiveUln302.sol";
+import {DVN, ExecuteParam} from "../messagelib/uln/dvn/DVN.sol";
+import {DVNFeeLib} from "../messagelib/uln/dvn/DVNFeeLib.sol";
+import {IExecutor} from "../messagelib/interfaces/IExecutor.sol";
+import {Executor} from "../messagelib/Executor.sol";
+import {PriceFeed} from "../messagelib/PriceFeed.sol";
+import {ILayerZeroPriceFeed} from "../messagelib/interfaces/ILayerZeroPriceFeed.sol";
+import {IReceiveUlnE2} from "../messagelib/uln/interfaces/IReceiveUlnE2.sol";
+import {ReceiveUln302} from "../messagelib/uln/uln302/ReceiveUln302.sol";
 import {IMessageLib} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessageLib.sol";
 import {EndpointV2} from "@layerzerolabs/lz-evm-protocol-v2/contracts/EndpointV2.sol";
 import {ExecutorOptions} from "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/ExecutorOptions.sol";

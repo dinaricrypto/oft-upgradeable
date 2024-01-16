@@ -8,6 +8,8 @@
     "test": "forge test -vvv"
   },
   "devDependencies": {
+    "@axelar-network/axelar-gmp-sdk-solidity": "^5.6.4",
+    "@chainlink/contracts-ccip": "^1.2.1",
     "@layerzerolabs/lz-evm-messagelib-v2": "^2.0.11",
     "@layerzerolabs/lz-evm-oapp-v2": "^2.0.11",
     "@layerzerolabs/lz-evm-protocol-v2": "^2.0.11",
