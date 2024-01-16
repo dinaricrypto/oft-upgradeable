@@ -7,10 +7,7 @@ import {DoubleEndedQueue} from "@openzeppelin/contracts/utils/structs/DoubleEnde
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 import {UlnConfig, SetDefaultUlnConfigParam} from "../messagelib/uln/UlnBase.sol";
-import {
-    SetDefaultExecutorConfigParam,
-    ExecutorConfig
-} from "../messagelib/SendLibBase.sol";
+import {SetDefaultExecutorConfigParam, ExecutorConfig} from "../messagelib/SendLibBase.sol";
 import {ReceiveUln302} from "../messagelib/uln/uln302/ReceiveUln302.sol";
 import {DVN, ExecuteParam} from "../messagelib/uln/dvn/DVN.sol";
 import {DVNFeeLib} from "../messagelib/uln/dvn/DVNFeeLib.sol";

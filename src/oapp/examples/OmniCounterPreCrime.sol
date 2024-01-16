@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.22;
 
-import { PreCrime, PreCrimePeer } from "../../precrime/PreCrime.sol";
-import { InboundPacket } from "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/libs/Packet.sol";
-import { OmniCounter } from "./OmniCounter.sol";
+import {PreCrime, PreCrimePeer} from "../../precrime/PreCrime.sol";
+import {InboundPacket} from "@layerzerolabs/lz-evm-oapp-v2/contracts/precrime/libs/Packet.sol";
+import {OmniCounter} from "./OmniCounter.sol";
 
 contract OmniCounterPreCrime is PreCrime {
     struct ChainCount {
@@ -27,7 +27,10 @@ contract OmniCounterPreCrime is PreCrime {
     }
 
     function _preCrime(
-        InboundPacket[] memory /** _packets */,
+        InboundPacket[] memory,
+        /**
+         * _packets
+         */
         uint32[] memory _eids,
         bytes[] memory _simulations
     ) internal view override {
@@ -46,7 +49,7 @@ contract OmniCounterPreCrime is PreCrime {
         for (uint256 i = 0; i < _eids.length; i++) {
             uint32 remoteEid = _eids[i];
             ChainCount[] memory remoteChainCounts = abi.decode(_simulations[i], (ChainCount[]));
-            (uint256 _inboundCount, ) = _findChainCounts(localChainCounts, remoteEid);
+            (uint256 _inboundCount,) = _findChainCounts(localChainCounts, remoteEid);
             (, uint256 _outboundCount) = _findChainCounts(remoteChainCounts, localEid);
             if (_inboundCount > _outboundCount) {
                 revert CrimeFound("inboundCount > outboundCount");
@@ -54,10 +57,11 @@ contract OmniCounterPreCrime is PreCrime {
         }
     }
 
-    function _findChainCounts(
-        ChainCount[] memory _chainCounts,
-        uint32 _remoteEid
-    ) internal pure returns (uint256, uint256) {
+    function _findChainCounts(ChainCount[] memory _chainCounts, uint32 _remoteEid)
+        internal
+        pure
+        returns (uint256, uint256)
+    {
         for (uint256 i = 0; i < _chainCounts.length; i++) {
             if (_chainCounts[i].remoteEid == _remoteEid) {
                 return (_chainCounts[i].inboundCount, _chainCounts[i].outboundCount);
@@ -66,9 +70,12 @@ contract OmniCounterPreCrime is PreCrime {
         return (0, 0);
     }
 
-    function _getPreCrimePeers(
-        InboundPacket[] memory _packets
-    ) internal view override returns (PreCrimePeer[] memory peers) {
+    function _getPreCrimePeers(InboundPacket[] memory _packets)
+        internal
+        view
+        override
+        returns (PreCrimePeer[] memory peers)
+    {
         PreCrimePeer[] memory allPeers = preCrimePeers;
         PreCrimePeer[] memory peersTmp = new PreCrimePeer[](_packets.length);
 
