@@ -226,10 +226,10 @@ contract TestHelper is Test, OptionsHelper {
     function wireOApps(address[] memory oapps) public {
         uint256 size = oapps.length;
         for (uint256 i = 0; i < size; i++) {
-            OApp localOApp = OApp(payable(oapps[i]));
+            OAppUpgradeable localOApp = OAppUpgradeable(payable(oapps[i]));
             for (uint256 j = 0; j < size; j++) {
                 if (i == j) continue;
-                OApp remoteOApp = OApp(payable(oapps[j]));
+                OAppUpgradeable remoteOApp = OAppUpgradeable(payable(oapps[j]));
                 uint32 remoteEid = (remoteOApp.endpoint()).eid();
                 localOApp.setPeer(remoteEid, addressToBytes32(address(remoteOApp)));
             }

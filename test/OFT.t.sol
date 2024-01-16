@@ -3,9 +3,9 @@ pragma solidity ^0.8.22;
 
 import {OptionsBuilder} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/libs/OptionsBuilder.sol";
 
-import {OFTMock} from "./mocks/OFTMock.sol";
+import {OFTMock, OFTUpgradeable} from "./mocks/OFTMock.sol";
 import {MessagingFee, MessagingReceipt} from "../src/oft/OFTCoreUpgradeable.sol";
-import {OFTAdapterMock} from "./mocks/OFTAdapterMock.sol";
+import {OFTAdapterMock, OFTAdapterUpgradeable} from "./mocks/OFTAdapterMock.sol";
 import {ERC20Mock} from "./mocks/ERC20Mock.sol";
 import {OFTComposerMock} from "./mocks/OFTComposerMock.sol";
 import {OFTInspectorMock, IOAppMsgInspector} from "./mocks/OFTInspectorMock.sol";
@@ -48,18 +48,26 @@ contract OFTTest is TestHelper {
         setUpEndpoints(3, LibraryType.UltraLightNode);
 
         aOFT = OFTMock(
-            _deployOApp(type(OFTMock).creationCode, abi.encodeCall(OFTMock.initialize, "aOFT", "aOFT", address(endpoints[aEid]), address(this)))
+            _deployOApp(
+                type(OFTMock).creationCode,
+                abi.encodeCall(OFTUpgradeable.initialize, ("aOFT", "aOFT", address(endpoints[aEid]), address(this)))
+            )
         );
 
         bOFT = OFTMock(
-            _deployOApp(type(OFTMock).creationCode, abi.encodeCall(OFTMock.initialize, "bOFT", "bOFT", address(endpoints[bEid]), address(this)))
+            _deployOApp(
+                type(OFTMock).creationCode,
+                abi.encodeCall(OFTUpgradeable.initialize, ("bOFT", "bOFT", address(endpoints[bEid]), address(this)))
+            )
         );
 
         cERC20Mock = new ERC20Mock("cToken", "cToken");
         cOFTAdapter = OFTAdapterMock(
             _deployOApp(
                 type(OFTAdapterMock).creationCode,
-                abi.encodeCall(OFTAdapterMock.initialize, address(cERC20Mock), address(endpoints[cEid]), address(this))
+                abi.encodeCall(
+                    OFTAdapterUpgradeable.initialize, (address(cERC20Mock), address(endpoints[cEid]), address(this))
+                )
             )
         );
 

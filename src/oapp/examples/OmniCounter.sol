@@ -97,18 +97,19 @@ contract OmniCounter is ILayerZeroComposer, OAppUpgradeable, OAppPreCrimeSimulat
         return $._eid;
     }
 
-    function inboundCount(uint32 srcEid) external view returns (uint256 count) {
+    function inboundCount(uint32 srcEid) external view returns (uint256) {
         OmniCounterStorage storage $ = _getOmniCounterStorage();
         return $._inboundCount[srcEid];
     }
 
-    function outboundCount(uint32 dstEid) external view returns (uint256 count) {
+    function outboundCount(uint32 dstEid) external view returns (uint256) {
         OmniCounterStorage storage $ = _getOmniCounterStorage();
         return $._outboundCount[dstEid];
     }
 
     modifier onlyAdmin() {
-        require(msg.sender == admin, "only admin");
+        OmniCounterStorage storage $ = _getOmniCounterStorage();
+        require(msg.sender == $._admin, "only admin");
         _;
     }
 
@@ -127,16 +128,18 @@ contract OmniCounter is ILayerZeroComposer, OAppUpgradeable, OAppPreCrimeSimulat
     // -------------------------------
     // Send
     function increment(uint32 _eid, uint8 _type, bytes calldata _options) external payable {
+        OmniCounterStorage storage $ = _getOmniCounterStorage();
         //        bytes memory options = combineOptions(_eid, _type, _options);
-        _lzSend(_eid, MsgCodec.encode(_type, eid), _options, MessagingFee(msg.value, 0), payable(msg.sender));
+        _lzSend(_eid, MsgCodec.encode(_type, $._eid), _options, MessagingFee(msg.value, 0), payable(msg.sender));
         _incrementOutbound(_eid);
     }
 
     // this is a broken function to skip incrementing outbound count
     // so that preCrime will fail
     function brokenIncrement(uint32 _eid, uint8 _type, bytes calldata _options) external payable onlyAdmin {
+        OmniCounterStorage storage $ = _getOmniCounterStorage();
         //        bytes memory options = combineOptions(_eid, _type, _options);
-        _lzSend(_eid, MsgCodec.encode(_type, eid), _options, MessagingFee(msg.value, 0), payable(msg.sender));
+        _lzSend(_eid, MsgCodec.encode(_type, $._eid), _options, MessagingFee(msg.value, 0), payable(msg.sender));
     }
 
     function batchIncrement(uint32[] calldata _eids, uint8[] calldata _types, bytes[] calldata _options)
@@ -145,6 +148,7 @@ contract OmniCounter is ILayerZeroComposer, OAppUpgradeable, OAppPreCrimeSimulat
     {
         require(_eids.length == _options.length && _eids.length == _types.length, "OmniCounter: length mismatch");
 
+        OmniCounterStorage storage $ = _getOmniCounterStorage();
         MessagingReceipt memory receipt;
         uint256 providedFee = msg.value;
         for (uint256 i = 0; i < _eids.length; i++) {
@@ -153,7 +157,11 @@ contract OmniCounter is ILayerZeroComposer, OAppUpgradeable, OAppPreCrimeSimulat
             uint8 msgType = _types[i];
             //            bytes memory options = combineOptions(dstEid, msgType, _options[i]);
             receipt = _lzSend(
-                dstEid, MsgCodec.encode(msgType, eid), _options[i], MessagingFee(providedFee, 0), payable(refundAddress)
+                dstEid,
+                MsgCodec.encode(msgType, $._eid),
+                _options[i],
+                MessagingFee(providedFee, 0),
+                payable(refundAddress)
             );
             _incrementOutbound(dstEid);
             providedFee -= receipt.fee.nativeFee;
@@ -167,8 +175,9 @@ contract OmniCounter is ILayerZeroComposer, OAppUpgradeable, OAppPreCrimeSimulat
         view
         returns (uint256 nativeFee, uint256 lzTokenFee)
     {
+        OmniCounterStorage storage $ = _getOmniCounterStorage();
         //        bytes memory options = combineOptions(_eid, _type, _options);
-        MessagingFee memory fee = _quote(_eid, MsgCodec.encode(_type, eid), _options, false);
+        MessagingFee memory fee = _quote(_eid, MsgCodec.encode(_type, $._eid), _options, false);
         return (fee.nativeFee, fee.lzTokenFee);
     }
 
@@ -214,7 +223,7 @@ contract OmniCounter is ILayerZeroComposer, OAppUpgradeable, OAppPreCrimeSimulat
             _incrementInbound(_origin.srcEid);
             endpoint().sendCompose(address(this), _guid, 0, _message);
         } else if (messageType == MsgCodec.ABA_TYPE) {
-            count++;
+            $._count++;
             _incrementInbound(_origin.srcEid);
 
             // send back to the sender
@@ -222,7 +231,7 @@ contract OmniCounter is ILayerZeroComposer, OAppUpgradeable, OAppPreCrimeSimulat
             bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 10);
             _lzSend(
                 _origin.srcEid,
-                MsgCodec.encode(MsgCodec.VANILLA_TYPE, eid, 10),
+                MsgCodec.encode(MsgCodec.VANILLA_TYPE, $._eid, 10),
                 options,
                 MessagingFee(msg.value, 0),
                 payable(address(this))
@@ -262,7 +271,7 @@ contract OmniCounter is ILayerZeroComposer, OAppUpgradeable, OAppPreCrimeSimulat
             bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
             _lzSend(
                 srcEid,
-                MsgCodec.encode(MsgCodec.VANILLA_TYPE, eid),
+                MsgCodec.encode(MsgCodec.VANILLA_TYPE, $._eid),
                 options,
                 MessagingFee(msg.value, 0),
                 payable(address(this))
