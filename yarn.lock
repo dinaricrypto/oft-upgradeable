@@ -9,12 +9,30 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dinari/oft-upgradeable@workspace:."
   dependencies:
+    "@layerzerolabs/lz-evm-messagelib-v2": ^2.0.11
     "@layerzerolabs/lz-evm-oapp-v2": ^2.0.11
     "@layerzerolabs/lz-evm-protocol-v2": ^2.0.11
+    "@layerzerolabs/lz-evm-v1-0.7": ^2.0.11
     "@openzeppelin/contracts": ^5.0.1
     "@openzeppelin/contracts-upgradeable": ^5.0.1
   languageName: unknown
   linkType: soft
+
+"@layerzerolabs/lz-evm-messagelib-v2@npm:^2.0.11":
+  version: 2.0.11
+  resolution: "@layerzerolabs/lz-evm-messagelib-v2@npm:2.0.11"
+  peerDependencies:
+    "@axelar-network/axelar-gmp-sdk-solidity": ^5.6.3
+    "@chainlink/contracts-ccip": ^0.7.6
+    "@layerzerolabs/lz-evm-protocol-v2": ^2.0.11
+    "@layerzerolabs/lz-evm-v1-0.7": ^2.0.11
+    "@openzeppelin/contracts": ^4.8.1
+    "@openzeppelin/contracts-upgradeable": ^4.8.1
+    hardhat-deploy: ^0.11.44
+    solidity-bytes-utils: ^0.8.0
+  checksum: e225a180ab0d40a92ae33397443828d84a23f760d39487c12e4c613b6bdd9c73feaac8916e5c3cc732357b23c100c32dddbb2dbecb171e5a30b5d6735b44a729
+  languageName: node
+  linkType: hard
 
 "@layerzerolabs/lz-evm-oapp-v2@npm:^2.0.11":
   version: 2.0.11
@@ -39,6 +57,17 @@ __metadata:
     hardhat-deploy: ^0.11.44
     solidity-bytes-utils: ^0.8.0
   checksum: be45219acd408b7d274ac1e6c2ba7ef309791126d313e2f4c98cdafc8684ff69354b1c7c36085fb79313d43a1f1307f3c96a940fcdd3d9c6ecbf7eaeaac6825d
+  languageName: node
+  linkType: hard
+
+"@layerzerolabs/lz-evm-v1-0.7@npm:^2.0.11":
+  version: 2.0.11
+  resolution: "@layerzerolabs/lz-evm-v1-0.7@npm:2.0.11"
+  peerDependencies:
+    "@openzeppelin/contracts": 3.4.2-solc-0.7 || ^3.4.2 || ^4.0.0
+    "@openzeppelin/contracts-upgradeable": 3.4.2-solc-0.7 || ^3.4.2 || ^4.0.0
+    hardhat-deploy: ^0.11.44
+  checksum: 61581fbc041c78a36d326a1a4200339c1843132e7268d0568659197384f6f473d65d66fc0ada009e1a25ee00d06c710cf58b38eeb575e9fc66260584e4d41191
   languageName: node
   linkType: hard
 
