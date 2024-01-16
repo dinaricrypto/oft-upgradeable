@@ -7,4 +7,4 @@ Upgradeable implementation of [LayerZero V2 OFT](https://github.com/LayerZero-La
 
 Target commit: [c321320](https://github.com/LayerZero-Labs/LayerZero-v2/commit/c3213200dfe8fabbf7d92c685590d34e6e70da43)
 
-Contains an Openzeppelin v5 compatible messagelib implementation.
+Contains an Openzeppelin v5 compatible messagelib and other dependencies.
